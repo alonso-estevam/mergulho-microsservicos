@@ -9,6 +9,8 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.*;
 
+import static java.lang.String.format;
+
 @NoArgsConstructor(access = AccessLevel.PACKAGE) // Construtor package-private para evitar instâncias externas, forçando o uso do método draft().
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
@@ -109,20 +111,20 @@ public class Delivery {
     public void place() {
 
         verifyIfCanBePlaced();
-        this.setStatus(DeliveryStatus.WAITING_FOR_COURIER);
+        this.changeStatusTo(DeliveryStatus.WAITING_FOR_COURIER);
         this.setPlacedAt(OffsetDateTime.now());
     }
 
     public void pickUp(UUID courierId) {
 
         this.setCourierId(courierId);
-        this.setStatus(DeliveryStatus.IN_TRANSIT);
+        this.changeStatusTo(DeliveryStatus.IN_TRANSIT);
         this.setAssignedAt(OffsetDateTime.now());
     }
 
     public void markAsDelivered() {
 
-        this.setStatus(DeliveryStatus.DELIVERED);
+        this.changeStatusTo(DeliveryStatus.DELIVERED);
         this.setFulfilledAt(OffsetDateTime.now());
     }
 
@@ -151,6 +153,16 @@ public class Delivery {
         return Objects.nonNull(this.getSender())
                 && Objects.nonNull(this.getRecipient())
                 && Objects.nonNull(this.getTotalCost());
+    }
+
+    private void changeStatusTo(DeliveryStatus newStatus) {
+
+        if (Objects.nonNull(newStatus) && this.getStatus().canNotChangeTo(newStatus)) {
+
+            throw new BusinessException(format("Invalid status transition from %s to %s",
+                    this.getStatus(), newStatus));
+        }
+        this.setStatus(newStatus);
     }
 
     // classe apenas para passagem de parâmetro

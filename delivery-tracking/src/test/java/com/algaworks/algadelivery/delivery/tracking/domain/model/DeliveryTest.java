@@ -56,8 +56,8 @@ class DeliveryTest {
         return Delivery.PreparationDetails.builder()
                 .sender(sender)
                 .recipient(recipient)
-                .distanceFee(new BigDecimal(15.00))
-                .courierPayout(new BigDecimal(5.00))
+                .distanceFee(new BigDecimal("15.00"))
+                .courierPayout(new BigDecimal("5.00"))
                 .expectedDeliveryTime(Duration.ofHours(5))
                 .build();
     }
